@@ -1,3 +1,4 @@
+from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 import h5py
@@ -142,3 +143,6 @@ def delete_file(filename: str):
         return {"message": f"File {filename} deleted successfully", "filename": filename}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Could not delete file: {str(e)}")
+
+
+app.mount("/", StaticFiles(directory="dist", html=True), name="static")
