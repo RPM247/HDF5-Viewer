@@ -1,0 +1,75 @@
+/* src/App.css */
+.app-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden; /* Prevents the entire app from having scrollbars */
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  overflow: hidden; /* Crucial: contains child elements inside this box */
+  position: relative;
+}
+
+.empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #aaa;
+  font-size: 1.2rem;
+}
+
+.toolbar {
+  padding: 10px 20px;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  flex-shrink: 0; /* Prevents toolbar from squishing */
+}
+
+.path-crumb {
+  font-family: monospace;
+  background: #eee;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.tabs button {
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  background: white;
+  color: #333; /* Ensure button text is dark */
+  cursor: pointer;
+  margin-left: -1px;
+}
+
+.tabs button:first-child {
+  border-radius: 4px 0 0 4px;
+}
+
+.tabs button:last-child {
+  border-radius: 0 4px 4px 0;
+}
+
+.tabs button.active {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
+}
+
+.viewport {
+  flex: 1;
+  overflow: auto; /* Adds scrollbars *inside* this area if content is too big */
+  padding: 20px;
+  background-color: #fbfbfb;
+  position: relative;
+  display: flex; /* Helps with centering content */
+  flex-direction: column;
+}
