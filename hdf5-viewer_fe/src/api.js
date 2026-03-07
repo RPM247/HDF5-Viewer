@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Change this to use the proxy we just created!
-const API_URL = '/api';
+const API_URL = '';
 
 export const fetchFiles = async () => {
   const response = await axios.get(`${API_URL}/files`);

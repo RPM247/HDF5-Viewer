@@ -17,9 +17,9 @@ app.add_middleware(
 
 BASE_DIR = "./data"
 
-@app.get("/")
-def home():
-    return {"message": "Backend is successfully running!"}
+# @app.get("/")
+# def home():
+#     return {"message": "Backend is successfully running!"}
 
 # FIX: Automatically create the data folder if it doesn't exist
 os.makedirs(BASE_DIR, exist_ok=True)
