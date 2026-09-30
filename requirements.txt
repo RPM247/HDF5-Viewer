@@ -3,3 +3,4 @@ uvicorn
 h5py
 numpy
 python-multipart
+zarr
