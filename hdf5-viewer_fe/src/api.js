@@ -1,7 +1,6 @@
 import axios from 'axios';
 
-// Updated to target the new backend namespace
-const API_URL = '/api';
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 export const fetchFiles = async () => {
   const response = await axios.get(`${API_URL}/files`);

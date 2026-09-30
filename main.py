@@ -1,4 +1,4 @@
-from fastapi.staticfiles import StaticFiles
+#from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List
@@ -250,4 +250,4 @@ def delete_file(filename: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Could not delete file: {str(e)}")
 
-app.mount("/", StaticFiles(directory="dist", html=True), name="static")
+#app.mount("/", StaticFiles(directory="dist", html=True), name="static")
