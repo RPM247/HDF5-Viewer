@@ -1,11 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 
 const MatrixViewer = ({ data }) => {
-  if (!data || data.length === 0) return <div style={{ padding: '20px' }}>No Data Available</div>;
+  if (!data || data.length === 0) return <div className="p-8 text-slate-500 font-mono text-sm">No data arrays to display.</div>;
 
-  // Handle 1D arrays by wrapping them
   const rows = Array.isArray(data[0]) ? data : [data];
-  
   const rowCount = rows.length;
   const colCount = rows[0].length;
 
@@ -33,13 +31,12 @@ const MatrixViewer = ({ data }) => {
     setScrollLeft(e.target.scrollLeft);
   };
 
-  const rowHeight = 35;
-  const colWidth = 85;
-  const overscan = 2; 
+  const rowHeight = 36;
+  const colWidth = 100;
+  const overscan = 4; 
   
   const startRow = Math.max(0, Math.floor(scrollTop / rowHeight) - overscan);
   const endRow = Math.min(rowCount + 1, Math.ceil((scrollTop + viewportSize.height) / rowHeight) + overscan);
-
   const startCol = Math.max(0, Math.floor(scrollLeft / colWidth) - overscan);
   const endCol = Math.min(colCount + 1, Math.ceil((scrollLeft + viewportSize.width) / colWidth) + overscan);
 
@@ -51,48 +48,41 @@ const MatrixViewer = ({ data }) => {
       const isHeaderCol = c === 0;
       let content = '';
       
-      let cellStyle = {
-        position: 'absolute',
-        top: r * rowHeight,
-        left: c * colWidth,
-        height: rowHeight,
-        width: colWidth,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-        paddingRight: '8px',
-        borderRight: '1px solid #ddd',
-        borderBottom: '1px solid #ddd',
-        fontSize: '12px',
-        fontFamily: 'monospace',
-        boxSizing: 'border-box',
-        color: '#111111',
-        backgroundColor: '#ffffff'
-      };
-
+      let baseClasses = "absolute flex items-center text-xs font-mono border-r border-b border-surface-700/50 box-border";
+      
       if (isHeaderRow && isHeaderCol) {
-        content = '#';
-        cellStyle.backgroundColor = '#e0e0e0';
-        cellStyle.fontWeight = 'bold';
-        cellStyle.justifyContent = 'center';
+        content = '';
+        baseClasses += " justify-center bg-surface-900 text-slate-500 font-bold z-20 shadow-[2px_2px_5px_rgba(0,0,0,0.2)]";
       } else if (isHeaderRow) {
         content = c - 1;
-        cellStyle.backgroundColor = '#e0e0e0';
-        cellStyle.fontWeight = 'bold';
-        cellStyle.justifyContent = 'center';
+        baseClasses += " justify-center bg-surface-800/90 backdrop-blur text-slate-400 z-10 font-medium";
       } else if (isHeaderCol) {
         content = r - 1;
-        cellStyle.backgroundColor = '#e0e0e0';
-        cellStyle.fontWeight = 'bold';
-        cellStyle.justifyContent = 'center';
+        baseClasses += " justify-center bg-surface-800/90 backdrop-blur text-slate-400 z-10 font-medium";
       } else {
         const val = rows[r - 1][c - 1];
         content = val === null ? 'NaN' : typeof val === 'number' ? val.toFixed(4) : val;
-        cellStyle.color = val === 0 ? '#999999' : '#111111';
+        
+        // Data cell specific styling
+        const isNaN = val === null;
+        const isZero = val === 0;
+        const isString = typeof val === 'string'; // Catches "Infinity"
+        
+        const textColor = isNaN ? "text-red-400/80" : isString ? "text-amber-400/80" : isZero ? "text-slate-600" : "text-slate-300";
+        baseClasses += ` justify-end pr-3 bg-transparent ${textColor} hover:bg-surface-700/30 transition-colors`;
       }
 
       visibleCells.push(
-        <div key={`${r}-${c}`} style={cellStyle}>
+        <div 
+          key={`${r}-${c}`} 
+          className={baseClasses}
+          style={{
+            top: r * rowHeight,
+            left: c * colWidth,
+            height: rowHeight,
+            width: colWidth,
+          }}
+        >
           {content}
         </div>
       );
@@ -100,26 +90,11 @@ const MatrixViewer = ({ data }) => {
   }
 
   return (
-    <div style={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column' }}>
-      
-      {/* Header Info Banner */}
-      <div style={{ 
-        padding: '12px 20px', 
-        fontSize: '13px', 
-        color: '#333', 
-        backgroundColor: '#f8f9fa', 
-        borderBottom: '1px solid #ddd',
-        flexShrink: 0
-      }}>
-        Showing full dataset: <strong>{rowCount} x {colCount}</strong> matrix. 
-        <em> (Scroll to view all data)</em>
-      </div>
-      
-      {/* Custom Virtualized Scroll Container */}
+    <div className="h-full w-full flex flex-col bg-[#111113]">
       <div 
         ref={containerRef} 
         onScroll={handleScroll}
-        style={{ flex: 1, minHeight: 0, overflow: 'auto', position: 'relative' }}
+        className="flex-1 overflow-auto relative"
       >
         <div style={{ 
           height: (rowCount + 1) * rowHeight, 
@@ -129,7 +104,6 @@ const MatrixViewer = ({ data }) => {
           {visibleCells}
         </div>
       </div>
-      
     </div>
   );
 };

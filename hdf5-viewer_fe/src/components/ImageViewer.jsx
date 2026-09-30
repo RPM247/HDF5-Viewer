@@ -1,21 +1,20 @@
 import React, { useRef, useEffect, useState } from 'react';
+import { ZoomIn, RotateCcw } from 'lucide-react';
 
-// Exact 6-Class Mapping for Change Detection Masks
 const COLOR_MAP = {
-  0: [0, 0, 0, 0],         // Stable / NoData (Transparent)
-  1: [255, 0, 0, 255],     // Veg Loss (Red)
-  2: [0, 255, 0, 255],     // Veg Gain (Green)
-  3: [255, 255, 0, 255],   // Urban Gain (Yellow)
-  4: [0, 255, 255, 255],   // Water Loss (Cyan)
-  5: [0, 0, 255, 255]      // Water Gain (Blue)
+  0: [0, 0, 0, 0],       
+  1: [239, 68, 68, 255], 
+  2: [34, 197, 94, 255], 
+  3: [234, 179, 8, 255], 
+  4: [6, 182, 212, 255], 
+  5: [59, 130, 246, 255] 
 };
 
 const ImageViewer = ({ data, path }) => {
   const canvasRef = useRef(null);
   const [composite, setComposite] = useState('false_color'); 
-  const [zoom, setZoom] = useState(200); // Default to 200% so it's instantly bigger
+  const [zoom, setZoom] = useState(200);
 
-  // 1. Detect Dimensions and Shape (Moved outside useEffect so CSS can use W and H)
   const is3D = data && Array.isArray(data[0]) && Array.isArray(data[0][0]);
   let C = 1, H = 0, W = 0, isChannelFirst = true;
 
@@ -40,26 +39,21 @@ const ImageViewer = ({ data, path }) => {
     
     const isMask = path && (path.toLowerCase().includes('mask') || path.toLowerCase().includes('label'));
 
-    // --- MODE A: SEGMENTATION MASK ---
     if (isMask) {
       const flat = data.flat(Infinity); 
       for (let i = 0; i < flat.length; i++) {
         const val = Math.round(flat[i]);
         const color = COLOR_MAP[val] || [255, 255, 255, 255]; 
-        
         imgData.data[i * 4] = color[0];
         imgData.data[i * 4 + 1] = color[1];
         imgData.data[i * 4 + 2] = color[2];
         imgData.data[i * 4 + 3] = color[3];
       }
-    } 
-    // --- MODE B: MULTI-BAND SATELLITE IMAGE ---
-    else if (is3D && C >= 3) {
+    } else if (is3D && C >= 3) {
       const bands = [];
       for (let c = 0; c < C; c++) {
         bands.push(isChannelFirst ? data[c].flat() : data.map(row => row.map(pixel => pixel[c])).flat(Infinity));
       }
-
       const rIdx = composite === 'true_color' ? 2 : 3;
       const gIdx = composite === 'true_color' ? 1 : 2;
       const bIdx = composite === 'true_color' ? 0 : 1;
@@ -74,19 +68,15 @@ const ImageViewer = ({ data, path }) => {
         imgData.data[i * 4 + 2] = ((bands[bIdx][i] - min) / (max - min)) * 255;
         imgData.data[i * 4 + 3] = 255;
       }
-    } 
-    // --- MODE C: SINGLE BAND GRAYSCALE ---
-    else {
+    } else {
       const flat = data.flat(Infinity);
       let min = Infinity, max = -Infinity;
       for (let v of flat) { if (v < min) min = v; if (v > max) max = v; }
-
       for (let i = 0; i < flat.length; i++) {
           let pixel = ((flat[i] - min) / (max - min)) * 255;
           imgData.data[i * 4] = pixel; imgData.data[i * 4 + 1] = pixel; imgData.data[i * 4 + 2] = pixel; imgData.data[i * 4 + 3] = 255;
       }
     }
-
     ctx.putImageData(imgData, 0, 0);
   }, [data, path, composite, W, H]);
 
@@ -94,60 +84,58 @@ const ImageViewer = ({ data, path }) => {
   const showComposite = is3D && !isMask && (C >= 3);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', width: '100%' }}>
+    <div className="flex flex-col h-full w-full bg-[#111113]">
       
-      {/* Universal Controls Bar */}
-      <div style={{ padding: '10px 20px', backgroundColor: '#fff', borderBottom: '1px solid #ddd', display: 'flex', gap: '30px', alignItems: 'center', flexWrap: 'wrap' }}>
+      {/* Controls Bar */}
+      <div className="px-6 py-3 bg-surface-900 border-b border-surface-800 flex gap-8 items-center flex-wrap shadow-md z-10">
         
-        {/* Zoom Controls (Always Visible) */}
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-          <label style={{ fontSize: '14px', fontWeight: 'bold', color: '#333' }}>Zoom: {zoom}%</label>
+        <div className="flex gap-4 items-center">
+          <div className="flex items-center gap-2 text-slate-400">
+            <ZoomIn size={16} />
+            <span className="text-xs font-mono font-medium w-12">{zoom}%</span>
+          </div>
           <input 
-            type="range" 
-            min="50" 
-            max="1000" 
-            step="50"
-            value={zoom} 
+            type="range" min="50" max="1000" step="50" value={zoom} 
             onChange={(e) => setZoom(Number(e.target.value))}
-            style={{ cursor: 'pointer' }}
+            className="w-32 accent-brand-500 cursor-pointer"
           />
           <button 
             onClick={() => setZoom(100)} 
-            style={{ padding: '4px 8px', fontSize: '12px', background: '#e5e7eb', color: '#333', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+            className="p-1.5 hover:bg-surface-800 text-slate-500 hover:text-white rounded transition-colors"
+            title="Reset Zoom"
           >
-            Reset
+            <RotateCcw size={16} />
           </button>
         </div>
 
-        {/* Composite Controls (Only for Multi-band images) */}
         {showComposite && (
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'center', borderLeft: '1px solid #ccc', paddingLeft: '30px' }}>
-            <label style={{ fontSize: '14px', fontWeight: 'bold', color: '#333' }}>Composite:</label>
+          <div className="flex gap-3 items-center border-l border-surface-700 pl-8">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Composite</span>
             <select 
               value={composite} 
               onChange={(e) => setComposite(e.target.value)}
-              style={{ padding: '4px', borderRadius: '4px', border: '1px solid #ccc', color: '#333' }}
+              className="bg-surface-800 text-sm text-slate-200 border border-surface-700 rounded-md px-3 py-1.5 focus:outline-none focus:border-brand-500 transition-colors cursor-pointer"
             >
-              <option value="false_color">False Color (NIR, Red, Green)</option>
+              <option value="false_color">False Color (NIR, R, G)</option>
               <option value="true_color">True Color (RGB)</option>
             </select>
           </div>
         )}
       </div>
 
-      {/* Viewport */}
-      <div style={{ flex: 1, overflow: 'auto', backgroundColor: '#e5e7eb', padding: '20px', display: 'flex', justifyContent: 'center', alignItems: 'flex-start' }}>
+      {/* Canvas Viewport */}
+      <div className="flex-1 overflow-auto bg-black flex justify-center items-center p-8 relative custom-scrollbar">
+        {/* Subtle grid background for transparent masks */}
+        <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
+        
         <canvas 
           ref={canvasRef} 
-          width={W}
-          height={H}
+          width={W} height={H}
+          className={`shadow-[0_0_50px_rgba(0,0,0,0.5)] border border-surface-800 transition-all duration-100 ease-linear ${isMask ? 'bg-surface-900' : 'bg-black'}`}
           style={{ 
             imageRendering: 'pixelated', 
-            backgroundColor: isMask ? '#fff' : '#000', 
-            boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
             width: `${W * (zoom / 100)}px`,
             height: `${H * (zoom / 100)}px`,
-            transition: 'width 0.1s, height 0.1s' 
           }} 
         />
       </div>
