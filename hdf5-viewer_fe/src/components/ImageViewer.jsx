@@ -126,7 +126,7 @@ const ImageViewer = ({ data, path }) => {
       {/* Canvas Viewport */}
       <div className="flex-1 overflow-auto bg-black flex justify-center items-center p-8 relative custom-scrollbar">
         {/* Subtle grid background for transparent masks */}
-        <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>
+        {/*<div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '20px 20px' }}></div>*/}
         
         <canvas 
           ref={canvasRef} 

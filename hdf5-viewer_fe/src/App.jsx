@@ -145,8 +145,8 @@ const Home = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            <a href="#" className="text-slate-500 hover:text-white transition-colors"><Github className="w-5 h-5" /></a>
-            <a href="#" className="text-slate-500 hover:text-blue-400 transition-colors"><Linkedin className="w-5 h-5" /></a>
+            <a href="https://github.com/RPM247" className="text-slate-500 hover:text-white transition-colors"><Github className="w-5 h-5" /></a>
+            <a href="https://www.linkedin.com/in/priyanshu-rami-271824312" className="text-slate-500 hover:text-blue-400 transition-colors"><Linkedin className="w-5 h-5" /></a>
           </div>
         </div>
       </footer>

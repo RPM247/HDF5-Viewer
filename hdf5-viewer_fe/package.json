@@ -21,7 +21,8 @@
     "react-plotly.js": "^2.6.0",
     "react-router-dom": "^7.18.4",
     "react-virtualized-auto-sizer": "^2.0.3",
-    "react-window": "^2.2.7"
+    "react-window": "^2.2.7",
+    "uuid": "^14.0.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
